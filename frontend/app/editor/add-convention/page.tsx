@@ -27,7 +27,7 @@ export default function AddConventionPage() {
     cout_total: "",
     contribution_region: "",
     secteur_id: "",
-    domaine_id: "",
+    domaine: "",
     porteur_projet: "",
     numero_decision: "",
     partenaires: "",
@@ -111,7 +111,7 @@ export default function AddConventionPage() {
       const parsedDateDebut = parseOCRDate(result["سريان_الاتفاقية"]);
       const parsedCout = parseOCRNumber(result["المبلغ_الإجمالي"]);
       const parsedContribution = parseOCRNumber(result["مساهمة_الجهة"]);
-      const foundDomaine = findIdByName(domaines, result["المجال"]);
+      const foundDomaine = result["المجال"] || "";
       const foundProgramme = findIdByName(programmes, result["البرامج"]);
       const foundType = findIdByName(typesConvention, result["نوع_الاتفاقية"]);
       const foundPorteur = result["صاحب_المشروع"] || "";
@@ -134,7 +134,7 @@ export default function AddConventionPage() {
         numero_decision: result["رقم_القرار"] ?? prev.numero_decision,
         cout_total: parsedCout || prev.cout_total,
         contribution_region: parsedContribution || prev.contribution_region,
-        domaine_id: foundDomaine || prev.domaine_id,
+        domaine: foundDomaine || prev.domaine,
         programme_id: foundProgramme || prev.programme_id,
         type_convention_id: foundType || prev.type_convention_id,
         porteur_projet: foundPorteur || prev.porteur_projet,
@@ -328,19 +328,14 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
             <div>
               <label className="font-medium">المجال</label>
-              <select suppressHydrationWarning
-                name="domaine_id"
-                value={formData.domaine_id}
+              <input suppressHydrationWarning
+                name="domaine"
+                value={formData.domaine}
                 onChange={handleChange}
+                type="text"
+                placeholder="أدخل المجال"
                 className="w-full border rounded-lg p-3 mt-2"
-              >
-                <option value="">اختر المجال</option>
-                {domaines.map((domaine) => (
-                  <option key={domaine.id} value={domaine.id}>
-                    {domaine.nom}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div>

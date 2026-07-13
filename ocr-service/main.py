@@ -13,6 +13,12 @@ import json
 from io import BytesIO
 from contextlib import asynccontextmanager
 from pathlib import Path
+from Services.llm_extractor import extract_with_llm
+from Services.merge import (
+    merge_results,
+    needs_llm,
+)
+
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,7 +40,7 @@ logger = logging.getLogger(__name__)
 # Taille max du fichier (20 MB)
 MAX_FILE_SIZE = 20 * 1024 * 1024
 RESULTS_CACHE_DIR = Path(__file__).resolve().parent / "results_cache"
-CACHE_VERSION = "business-schema-v7"
+CACHE_VERSION = "business-schema-v10"
 SUPPORTED_EXTENSIONS = {".pdf", ".docx"}
 
 
@@ -254,6 +260,12 @@ async def extract(file: UploadFile = File(...)):
             t = time.time()
             text = run_ocr(processed_images)
             logger.info(f"[{request_id}] 3/5 OCR en {time.time() - t:.1f}s - {len(text)} caracteres")
+            
+            print("\n" + "="*50)
+            print("TEXTE BRUT EXTRAIT PAR L'OCR :")
+            print(text)
+            print("="*50 + "\n")
+            
             source_type = "pdf_ocr"
         else:
             t = time.time()
@@ -269,17 +281,40 @@ async def extract(file: UploadFile = File(...)):
             }
             _save_cached_result(file_hash, result)
             return result
-
         # 4. NLP (BERT arabe)
         t = time.time()
         entities = extract_entities(text)
         logger.info(f"[{request_id}] 4/5 NLP en {time.time() - t:.1f}s — {len(entities)} entites")
-
+         
         # 5. Post-traitement
         t = time.time()
         result = clean_output(text, entities)
         logger.info(f"[{request_id}] 5/5 Post-traitement en {time.time() - t:.1f}s")
 
+        # 6. Compléter avec le LLM si nécessaire
+        if needs_llm(result):
+
+            logger.info(f"[{request_id}] Des champs sont manquants → appel du LLM")
+
+            try:
+                text_for_llm = text[:12000]
+
+                llm_result = extract_with_llm(
+                    text_for_llm,
+                    result
+                )
+
+                result = merge_results(result, llm_result)
+
+                logger.info(f"[{request_id}] Fusion avec le LLM terminée")
+
+            except Exception as e:
+
+                logger.warning(f"[{request_id}] Erreur LLM : {e}")
+
+        else:
+
+            logger.info(f"[{request_id}] Tous les champs ont été trouvés par Regex/NLP")
         # Ajouter les metadonnees
         processing_time = round(time.time() - total_start, 1)
 
