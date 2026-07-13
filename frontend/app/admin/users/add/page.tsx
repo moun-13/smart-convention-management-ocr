@@ -38,8 +38,16 @@ export default function AddUserPage() {
       await createUser(formData);
       alert("تمت إضافة المستخدم بنجاح");
       router.push("/admin/users");
-    } catch {
-      alert(" حدث خطأ أثناء إضافة المستخدم");
+    } catch (error: any) {
+      console.error("Error creating user:", error);
+      if (error.response?.data?.errors) {
+        const errorMessages = Object.values(error.response.data.errors).flat().join('\n');
+        alert("حدث خطأ أثناء الإضافة:\n" + errorMessages);
+      } else if (error.response?.data?.message) {
+        alert("حدث خطأ أثناء الإضافة: " + error.response.data.message);
+      } else {
+        alert(" حدث خطأ أثناء إضافة المستخدم");
+      }
     }
   };
 

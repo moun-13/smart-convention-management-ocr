@@ -28,9 +28,9 @@ export default function AddConventionPage() {
     contribution_region: "",
     secteur_id: "",
     domaine_id: "",
-    porteur_projet_id: "",
+    porteur_projet: "",
     numero_decision: "",
-    partenaires: [] as any[],
+    partenaires: "",
     porteur_delegue_id: "",
     competence: "",
     date_debut: "",
@@ -114,14 +114,13 @@ export default function AddConventionPage() {
       const foundDomaine = findIdByName(domaines, result["المجال"]);
       const foundProgramme = findIdByName(programmes, result["البرامج"]);
       const foundType = findIdByName(typesConvention, result["نوع_الاتفاقية"]);
-      const foundPorteur = findIdByName(porteursProjet, result["صاحب_المشروع"]);
+      const foundPorteur = result["صاحب_المشروع"] || "";
       
-      let foundPartenaires: any[] = [];
+      let foundPartenaires = "";
       if (Array.isArray(result["الأطراف"])) {
-        foundPartenaires = result["الأطراف"].map((party: string) => findIdByName(partenairesList, party)).filter(Boolean);
+        foundPartenaires = result["الأطراف"].join("، ");
       } else if (typeof result["الأطراف"] === "string") {
-        const found = findIdByName(partenairesList, result["الأطراف"]);
-        if (found) foundPartenaires.push(found);
+        foundPartenaires = result["الأطراف"];
       }
 
 
@@ -138,9 +137,9 @@ export default function AddConventionPage() {
         domaine_id: foundDomaine || prev.domaine_id,
         programme_id: foundProgramme || prev.programme_id,
         type_convention_id: foundType || prev.type_convention_id,
-        porteur_projet_id: foundPorteur || prev.porteur_projet_id,
+        porteur_projet: foundPorteur || prev.porteur_projet,
         date_debut: parsedDateDebut || prev.date_debut,
-        partenaires: foundPartenaires.length > 0 ? foundPartenaires : prev.partenaires,
+        partenaires: foundPartenaires || prev.partenaires,
       }));
 
       alert("تم استخراج البيانات بنجاح");
@@ -346,19 +345,14 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
             <div>
               <label className="font-medium">صاحب المشروع</label>
-              <select suppressHydrationWarning
-                name="porteur_projet_id"
-                value={formData.porteur_projet_id}
+              <input suppressHydrationWarning
+                name="porteur_projet"
+                value={formData.porteur_projet}
                 onChange={handleChange}
+                type="text"
+                placeholder="أدخل صاحب المشروع"
                 className="w-full border rounded-lg p-3 mt-2"
-              >
-                <option value="">اختر صاحب المشروع</option>
-                {porteursProjet.map((porteur) => (
-                  <option key={porteur.id} value={porteur.id}>
-                    {porteur.nom}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div>
@@ -373,28 +367,14 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
             <div>
               <label className="font-medium">الشركاء</label>
-             <select suppressHydrationWarning
-                 multiple
-                 name="partenaires"
-                 value={formData.partenaires.map(String)}
-                 onChange={(e) => {
-                   const values = Array.from(
-                     e.target.selectedOptions,
-                     (option) => Number(option.value)
-                   );
-               
-                   setFormData((prev) => ({
-                     ...prev,
-                     partenaires: values,
-                   }));
-                 }}
-                 className="w-full border rounded-lg p-3 mt-2">
-                 {partenairesList.map((partenaire) => (
-                   <option key={partenaire.id} value={partenaire.id}>
-                     {partenaire.nom}
-                   </option>
-                  ))}
-               </select>
+              <input suppressHydrationWarning
+                name="partenaires"
+                value={formData.partenaires}
+                onChange={handleChange}
+                type="text"
+                placeholder="أدخل الشركاء"
+                className="w-full border rounded-lg p-3 mt-2"
+              />
             </div>
 
             <div>
