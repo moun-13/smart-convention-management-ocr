@@ -20,6 +20,8 @@ class Convention extends Model
         'numero_decision',
         'date_debut',
         'statut',
+        'etat_convention',
+        'competence',
         'secteur_id',
         'domaine_id',
         'programme_id',

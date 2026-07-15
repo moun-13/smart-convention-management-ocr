@@ -62,10 +62,20 @@ export default function EditConventionPage() {
         ]);
 
         if (convention && convention.partenaires) {
-          convention.partenaires = convention.partenaires.map((p: any) => p.id);
+          convention.partenaires = convention.partenaires.map((p: any) => p.nom).join('، ');
         } else {
-          convention.partenaires = [];
+          convention.partenaires = "";
         }
+        
+        convention.domaine = convention.domaine?.nom || "";
+        convention.type_convention = convention.type_convention?.nom || "";
+        convention.porteur_projet = convention.porteur_projet?.nom || "";
+        convention.porteur_delegue = convention.porteur_delegue?.nom || "";
+        
+        delete convention.domaine_id;
+        delete convention.type_convention_id;
+        delete convention.porteur_projet_id;
+        delete convention.porteur_delegue_id;
 
         setFormData(convention);
         setSecteurs(secteursData);
@@ -101,8 +111,10 @@ export default function EditConventionPage() {
 
       const parseOCRDate = (dateStr?: string) => {
         if (!dateStr) return "";
-        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
-        const numericMatch = dateStr.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
+        let normalized = dateStr.replace(/[٠-٩]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x0660 + 48));
+        if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return normalized;
+        if (/^\d{4}$/.test(normalized)) return `${normalized}-01-01`;
+        const numericMatch = normalized.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
         if (numericMatch) {
           const [, d, m, y] = numericMatch;
           return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
@@ -113,24 +125,32 @@ export default function EditConventionPage() {
           أكتوبر: "10", اكتوبر: "10", نونبر: "11", نوفمبر: "11", دجنبر: "12", ديسمبر: "12",
         };
         for (const [arMonth, num] of Object.entries(months)) {
-          if (dateStr.includes(arMonth)) {
-            const dayMatch = dateStr.match(/\b(\d{1,2})\b/);
-            const yearMatch = dateStr.match(/\b(\d{4})\b/);
+          if (normalized.includes(arMonth)) {
+            const dayMatch = normalized.match(/\b(\d{1,2})\b/);
+            const yearMatch = normalized.match(/\b(\d{4})\b/);
             if (dayMatch && yearMatch) {
-              return `${yearMatch[1]}-${num}-${dayMatch[1].padStart(2, "0")}`;
+              return `${yearMatch[1]}-${num}-${dayMatch[1].padStart(2, '0')}`;
             }
           }
         }
-        return dateStr;
+        return normalized;
       };
 
       const parseOCRNumber = (numStr?: string) => {
         if (!numStr) return "";
-        const asciiStr = numStr.replace(/[٠-٩]/g, (d) =>
-          String.fromCharCode(d.charCodeAt(0) - 0x0660 + 48)
-        );
-        let cleaned = asciiStr.replace(/[^\d.,]/g, "");
-        cleaned = cleaned.replace(/,/g, ".");
+        const asciiStr = numStr.replace(/[٠-٩]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x0660 + 48));
+        const match = asciiStr.match(/[\d\s.,]+/);
+        if (!match) return "";
+        
+        let cleaned = match[0].trim();
+        const decMatch = cleaned.match(/[,.](\d{1,2})$/);
+        if (decMatch) {
+            cleaned = cleaned.slice(0, -decMatch[0].length);
+            cleaned = cleaned.replace(/[^\d]/g, '');
+            cleaned = cleaned + '.' + decMatch[1];
+        } else {
+            cleaned = cleaned.replace(/[^\d]/g, '');
+        }
         return cleaned;
       };
 
@@ -159,19 +179,13 @@ export default function EditConventionPage() {
       const parsedDateDebut = parseOCRDate(result["سريان_الاتفاقية"]);
       const parsedCout = parseOCRNumber(result["المبلغ_الإجمالي"]);
       const parsedContribution = parseOCRNumber(result["مساهمة_الجهة"]);
-      const foundDomaine = findIdByName(domaines, result["المجال"]);
       const foundProgramme = findIdByName(programmes, result["البرامج"]);
-      const foundType = findIdByName(typesConvention, result["نوع_الاتفاقية"]);
-      const foundPorteur = findIdByName(porteursProjet, result["صاحب_المشروع"]);
 
-      let foundPartenaires: any[] = [];
+      let foundPartenaires = "";
       if (Array.isArray(result["الأطراف"])) {
-        foundPartenaires = result["الأطراف"]
-          .map((party: string) => findIdByName(partenairesList, party))
-          .filter(Boolean);
+        foundPartenaires = result["الأطراف"].join("، ");
       } else if (typeof result["الأطراف"] === "string") {
-        const found = findIdByName(partenairesList, result["الأطراف"]);
-        if (found) foundPartenaires.push(found);
+        foundPartenaires = result["الأطراف"];
       }
 
       setFormData((prev: any) => ({
@@ -184,12 +198,14 @@ export default function EditConventionPage() {
         numero_decision: result["رقم_القرار"] ?? prev.numero_decision,
         cout_total: parsedCout || prev.cout_total,
         contribution_region: parsedContribution || prev.contribution_region,
-        domaine_id: foundDomaine || prev.domaine_id,
+        domaine: result["المجال"] ?? prev.domaine,
         programme_id: foundProgramme || prev.programme_id,
-        type_convention_id: foundType || prev.type_convention_id,
-        porteur_projet_id: foundPorteur || prev.porteur_projet_id,
+        type_convention: result["نوع_الاتفاقية"] ?? prev.type_convention,
+        porteur_projet: result["صاحب_المشروع"] ?? prev.porteur_projet,
         date_debut: parsedDateDebut || prev.date_debut,
-        partenaires: foundPartenaires.length > 0 ? foundPartenaires : prev.partenaires,
+        partenaires: foundPartenaires || prev.partenaires,
+        etat_convention: result["حالة_الاتفاقية"] ?? prev.etat_convention,
+        competence: result["الاختصاص"] ?? prev.competence,
       }));
 
       alert("تم استخراج البيانات بنجاح");
@@ -225,14 +241,16 @@ export default function EditConventionPage() {
       if (!payload.annee || String(payload.annee).trim() === "") delete payload.annee;
       if (!payload.date_convention || String(payload.date_convention).trim() === "")
         delete payload.date_convention;
+        
+      if (payload.partenaires && typeof payload.partenaires === 'string') {
+        payload.partenaires = payload.partenaires.split(/[،,]/).map((p: string) => p.trim()).filter(Boolean);
+      } else if (!payload.partenaires) {
+        payload.partenaires = [];
+      }
 
       if(payload.secteur) delete payload.secteur;
-      if(payload.domaine) delete payload.domaine;
       if(payload.programme) delete payload.programme;
       if(payload.province) delete payload.province;
-      if(payload.typeConvention) delete payload.typeConvention;
-      if(payload.porteurProjet) delete payload.porteurProjet;
-      if(payload.porteurDelegue) delete payload.porteurDelegue;
       if(payload.piecesJointes) delete payload.piecesJointes;
       if(payload.pieces_jointes) delete payload.pieces_jointes;
       if(payload.statut) delete payload.statut;
@@ -374,36 +392,26 @@ export default function EditConventionPage() {
 
             <div>
               <label className="font-medium text-gray-700">المجال</label>
-              <select suppressHydrationWarning
-                name="domaine_id"
-                value={formData.domaine_id || ""}
+              <input suppressHydrationWarning
+                name="domaine"
+                value={formData.domaine || ""}
                 onChange={handleChange}
+                type="text"
+                placeholder="أدخل المجال"
                 className="w-full border rounded-lg p-3 mt-2"
-              >
-                <option value="">اختر المجال</option>
-                {domaines.map((domaine) => (
-                  <option key={domaine.id} value={domaine.id}>
-                    {domaine.nom}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div>
               <label className="font-medium text-gray-700">صاحب المشروع</label>
-              <select suppressHydrationWarning
-                name="porteur_projet_id"
-                value={formData.porteur_projet_id || ""}
+              <input suppressHydrationWarning
+                name="porteur_projet"
+                value={formData.porteur_projet || ""}
                 onChange={handleChange}
+                type="text"
+                placeholder="أدخل صاحب المشروع"
                 className="w-full border rounded-lg p-3 mt-2"
-              >
-                <option value="">اختر صاحب المشروع</option>
-                {porteursProjet.map((porteur) => (
-                  <option key={porteur.id} value={porteur.id}>
-                    {porteur.nom}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div>
@@ -418,46 +426,26 @@ export default function EditConventionPage() {
 
             <div>
               <label className="font-medium text-gray-700">الشركاء</label>
-              <select suppressHydrationWarning
-                multiple
+              <input suppressHydrationWarning
                 name="partenaires"
-                value={formData.partenaires ? formData.partenaires.map(String) : []}
-                onChange={(e) => {
-                  const values = Array.from(
-                    e.target.selectedOptions,
-                    (option) => Number(option.value)
-                  );
-
-                  setFormData((prev: any) => ({
-                    ...prev,
-                    partenaires: values,
-                  }));
-                }}
+                value={formData.partenaires || ""}
+                onChange={handleChange}
+                type="text"
+                placeholder="أدخل الشركاء (مفصولين بفاصلة)"
                 className="w-full border rounded-lg p-3 mt-2"
-              >
-                {partenairesList.map((partenaire) => (
-                  <option key={partenaire.id} value={partenaire.id}>
-                    {partenaire.nom}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div>
               <label className="font-medium text-gray-700">صاحب المشروع المنتدب</label>
-              <select suppressHydrationWarning
-                name="porteur_delegue_id"
-                value={formData.porteur_delegue_id || ""}
+              <input suppressHydrationWarning
+                name="porteur_delegue"
+                value={formData.porteur_delegue || ""}
                 onChange={handleChange}
+                type="text"
+                placeholder="أدخل صاحب المشروع المنتدب"
                 className="w-full border rounded-lg p-3 mt-2"
-              >
-                <option value="">اختر صاحب المشروع المنتدب</option>
-                {porteursProjet.map((porteur) => (
-                  <option key={porteur.id} value={porteur.id}>
-                    {porteur.nom}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div>
@@ -475,19 +463,14 @@ export default function EditConventionPage() {
 
             <div>
               <label className="font-medium text-gray-700">نوع الاتفاقية</label>
-              <select suppressHydrationWarning
-                name="type_convention_id"
-                value={formData.type_convention_id || ""}
+              <input suppressHydrationWarning
+                name="type_convention"
+                value={formData.type_convention || ""}
                 onChange={handleChange}
+                type="text"
+                placeholder="أدخل نوع الاتفاقية"
                 className="w-full border rounded-lg p-3 mt-2"
-              >
-                <option value="">اختر نوع الاتفاقية</option>
-                {typesConvention.map((typeConv) => (
-                  <option key={typeConv.id} value={typeConv.id}>
-                    {typeConv.nom}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div>

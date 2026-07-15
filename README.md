@@ -1,235 +1,350 @@
 <div align="center">
-  
-  # 📄 Smart Convention Management OCR
 
-  **Plateforme complète de gestion intelligente des conventions administratives, intégrant un service d'extraction de données via IA et OCR.**
-  
-  [![Next.js](https://img.shields.io/badge/Frontend-Next.js_16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-  [![Laravel](https://img.shields.io/badge/Backend-Laravel_12-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
-  [![FastAPI](https://img.shields.io/badge/OCR_Service-FastAPI-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
-  [![Python](https://img.shields.io/badge/AI-Python_3.9+-3776AB?style=for-the-badge&logo=python)](https://python.org)
-  [![Licence](https://img.shields.io/badge/Licence-MIT-blue.svg?style=for-the-badge)](LICENSE)
+# Smart Convention Management OCR
+
+**Plateforme complete de gestion intelligente des conventions administratives, integrant un service d'extraction de donnees via IA et OCR.**
+
+[![Frontend](https://img.shields.io/badge/Frontend-Next.js_16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Backend](https://img.shields.io/badge/Backend-Laravel_12-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com/)
+[![OCR Service](https://img.shields.io/badge/OCR_Service-FastAPI-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![AI](https://img.shields.io/badge/AI-Python_3.9+-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
+![License](https://img.shields.io/badge/Licence-MIT-blue?style=for-the-badge)
+
 </div>
 
 ---
 
-## 📖 À Propos du Projet
+## A propos
 
-**Smart Convention Management OCR** est une solution conçue pour simplifier, automatiser et centraliser la gestion des conventions (notamment administratives marocaines). 
-La particularité de ce système réside dans son **moteur d'Intelligence Artificielle intégré**, capable d'analyser des documents (PDF ou Word), d'en extraire le texte via OCR (Optical Character Recognition), et d'identifier les entités clés (NLP) pour pré-remplir automatiquement les informations de la convention.
+**Smart Convention Management OCR** est une application de gestion des conventions administratives. Elle centralise les conventions, leurs pieces jointes, les partenaires, les programmes, les domaines, les provinces et les statistiques de suivi.
 
-### 🎯 Objectifs
-- **Digitaliser** la gestion des conventions et de leurs pièces jointes.
-- **Gagner du temps** grâce à l'extraction automatique des données via l'OCR.
-- **Centraliser** les statistiques et le suivi des projets, domaines, et secteurs.
+Le projet ajoute un service OCR/IA capable d'analyser des documents PDF ou DOCX, d'extraire le texte, puis de detecter automatiquement les informations importantes pour pre-remplir les formulaires de convention.
 
----
+## Objectifs
 
-## ✨ Fonctionnalités Principales
-
-- 🔐 **Authentification & Rôles** : Gestion sécurisée des accès (Admin, Éditeur, Décideur) via Laravel Sanctum.
-- 📂 **Gestion des Conventions** : Création, modification et suivi complet des dossiers.
-- 🏢 **Gestion des Entités** : Secteurs, Domaines, Programmes, Provinces, Porteurs de projets et Partenaires.
-- 🧠 **Extraction OCR Intelligente** : Analyse de documents PDF/Word (Arabe et Français) pour extraire les entités et métadonnées.
-- 📊 **Tableau de Bord** : Statistiques globales pour la prise de décision.
-- 📎 **Gestion Documentaire** : Upload, téléchargement et prévisualisation des pièces jointes.
+- Digitaliser le cycle de vie des conventions administratives.
+- Reduire la saisie manuelle grace a l'extraction OCR et IA.
+- Centraliser les donnees metier: secteurs, domaines, programmes, provinces, porteurs de projets et partenaires.
+- Fournir un tableau de bord pour le suivi et la prise de decision.
+- Garder une architecture claire en separant l'interface, l'API metier et le traitement OCR.
 
 ---
 
-## 🏗️ Architecture Technique & Pipeline
+## Fonctionnalites
 
-Le projet adopte une architecture orientée **Micro-services** pour garantir la scalabilité et la séparation des responsabilités.
-
-```text
-+-------------------+       REST API       +-------------------+
-|                   |  <--------------->   |                   |
-|   🖥️ FRONTEND     |                      |   ⚙️ BACKEND      |
-|    (Next.js)      |                      |    (Laravel)      |
-|                   |                      |                   |
-+-------------------+                      +---------+---------+
-                                                     |
-                                                     | REST / JSON
-                                                     v
-                                           +-------------------+
-                                           |                   |
-                                           |   🧠 SERVICE OCR  |
-                                           |    (FastAPI)      |
-                                           |                   |
-                                           +-------------------+
-```
-
-### ⚙️ Pipeline de Traitement OCR
-Le processus d'analyse d'un document suit ce pipeline sophistiqué :
-1. **Upload** : Envoi du fichier (PDF/DOCX) depuis le Frontend vers Laravel.
-2. **Transfert** : Laravel transmet le document au micro-service FastAPI.
-3. **Conversion & Prétraitement** : Transformation en images (OpenCV, PDF2Image) et nettoyage du bruit.
-4. **Extraction (OCR)** : Utilisation de **EasyOCR** (Arabe/Français) pour lire le texte brut.
-5. **Analyse NLP** : Modèles BERT pour la reconnaissance d'entités nommées (NER) + algorithmes de Fuzzy Matching (Rapidfuzz).
-6. **Post-traitement** : Nettoyage, structuration des données en JSON et renvoi vers l'API Laravel.
+- **Authentification securisee** avec Laravel Sanctum.
+- **Gestion des roles**: administrateur, editeur et decideur.
+- **Gestion des conventions**: creation, consultation, modification, suppression selon les permissions.
+- **Gestion referentielle**: secteurs, domaines, programmes, provinces, types de conventions, porteurs de projets et partenaires.
+- **Gestion documentaire**: upload, consultation, telechargement et rattachement des pieces jointes.
+- **Extraction OCR intelligente**: analyse de documents PDF/DOCX en arabe et en francais.
+- **Pipeline IA**: OCR, NLP, fuzzy matching, post-traitement et enrichissement LLM si necessaire.
+- **Tableau de bord**: statistiques globales pour les decideurs.
 
 ---
 
-## 💻 Technologies Utilisées
+## Architecture
 
-### 🎨 Frontend
-- **Framework** : Next.js 16 (App Router), React 19
-- **Styling** : Tailwind CSS 4, Radix UI, Shadcn/ui
-- **Gestion d'état & Fetching** : React Query, Axios, React Hook Form
-- **Data Viz** : Recharts
-
-### 🛠️ Backend API
-- **Framework** : Laravel 12 (PHP 8.2+)
-- **Base de données** : MySQL / PostgreSQL / SQLite
-- **Authentification** : Laravel Sanctum
-
-### 🤖 IA & OCR Service
-- **Framework Web** : FastAPI, Uvicorn
-- **Moteur OCR** : EasyOCR, OpenCV, Pillow, PDF2Image
-- **Traitement NLP** : Transformers (Hugging Face), Torch, PyArabic
-- **Text Matching** : Rapidfuzz, Regex
-
----
-
-## 📂 Structure du Projet
+Le projet conserve une architecture en trois parties:
 
 ```text
 smart-convention-management-ocr/
-│
-├── frontend/           # Interface utilisateur moderne (Next.js)
-│   ├── app/            # Pages et routing
-│   ├── components/     # Composants réutilisables (Shadcn)
-│   ├── hooks/          # Custom hooks React
-│   └── services/       # Appels API (Axios)
-│
-├── laravel-api/        # Logique métier et base de données
-│   ├── app/Http/       # Controllers & Middleware
-│   ├── routes/         # Définition des API (api.php)
-│   └── database/       # Migrations, Seeders, Factories
-│
-└── ocr-service/        # Micro-service d'extraction
-    ├── main.py         # Entrypoint FastAPI
-    ├── Services/       # Logique OCR, NLP, Preprocess
-    └── requirements.txt# Dépendances Python
+|
+|-- frontend/       Interface utilisateur Next.js
+|-- laravel-api/    API REST, authentification et logique metier Laravel
+`-- ocr-service/    Micro-service FastAPI pour OCR, NLP et extraction IA
+```
+
+Vue d'ensemble des echanges:
+
+```text
++-------------------+        REST API         +-------------------+
+|                   | <---------------------> |                   |
+|     Frontend      |                         |    Laravel API    |
+|     Next.js 16    |                         |    Laravel 12     |
+|                   |                         |                   |
++-------------------+                         +---------+---------+
+                                                        |
+                                                        | HTTP multipart
+                                                        v
+                                              +-------------------+
+                                              |                   |
+                                              |    OCR Service    |
+                                              |     FastAPI       |
+                                              |                   |
+                                              +-------------------+
+```
+
+### Pipeline OCR
+
+1. L'utilisateur ajoute un document depuis l'interface Next.js.
+2. Le frontend envoie la demande a l'API Laravel.
+3. Laravel valide les droits et transmet le fichier au service FastAPI.
+4. FastAPI valide le fichier et accepte les formats `.pdf` et `.docx`.
+5. Pour les PDF, le service convertit les pages en images, applique le pretraitement, puis execute l'OCR.
+6. Pour les DOCX, le service extrait directement le texte du document.
+7. Le texte est analyse avec NLP, regex metier, fuzzy matching et post-traitement.
+8. Si des champs importants restent manquants, un extracteur LLM peut completer le resultat.
+9. Le resultat JSON est renvoye a Laravel, puis exploite par le frontend.
+10. Le service OCR met les resultats en cache par hash de fichier pour eviter les traitements repetes.
+
+---
+
+## Technologies
+
+### Frontend
+
+- **Next.js 16** avec App Router
+- **React 19**
+- **TypeScript**
+- **Tailwind CSS 4**
+- **Radix UI / shadcn**
+- **React Query**
+- **Axios**
+- **React Hook Form**
+- **Recharts**
+- **Lucide React / React Icons**
+
+### Backend
+
+- **Laravel 12**
+- **PHP 8.2+**
+- **Laravel Sanctum**
+- **Eloquent ORM**
+- **Migrations et seeders Laravel**
+- **SQLite, MySQL ou PostgreSQL** selon la configuration `.env`
+
+### Service OCR et IA
+
+- **FastAPI**
+- **Uvicorn**
+- **Python 3.9+**
+- **EasyOCR**
+- **OpenCV**
+- **PDF2Image**
+- **Pillow**
+- **Transformers / Torch**
+- **RapidFuzz**
+- **Regex**
+- **PyArabic**
+- **python-docx**
+
+---
+
+## Structure du projet
+
+```text
+frontend/
+|-- app/                  Pages et routes Next.js
+|-- components/           Composants UI reutilisables
+|-- context/              Contextes React
+|-- hooks/                Hooks personnalises
+|-- lib/                  Utilitaires applicatifs
+|-- services/             Clients API
+|-- types/                Types TypeScript
+`-- utils/                Fonctions utilitaires
+
+laravel-api/
+|-- app/Http/Controllers/Api/   Controleurs REST
+|-- app/Models/                 Modeles Eloquent
+|-- database/                   Migrations, factories et seeders
+|-- routes/api.php              Routes API
+|-- config/                     Configuration Laravel
+`-- storage/                    Stockage local des fichiers
+
+ocr-service/
+|-- main.py               Application FastAPI
+|-- Services/             OCR, NLP, matching, post-traitement et LLM
+|-- utils/                Conversion PDF et utilitaires
+|-- tests/                Scripts et tests d'evaluation OCR
+|-- results_cache/        Cache local des extractions
+`-- requirements.txt      Dependances Python
 ```
 
 ---
 
-## 🛠️ Prérequis & Installation
+## Prerequis
 
-### Prérequis Système
-- [Node.js](https://nodejs.org/) (v20+) & npm/yarn
-- [PHP](https://www.php.net/) (v8.2+) & [Composer](https://getcomposer.org/)
-- [Python](https://www.python.org/) (v3.9+)
-- Serveur de base de données (MySQL, PostgreSQL ou SQLite)
+- Node.js 20+ et npm
+- PHP 8.2+ et Composer
+- Python 3.9+
+- Une base de donnees compatible Laravel: SQLite, MySQL ou PostgreSQL
+- Poppler installe et disponible dans le `PATH` pour la conversion PDF via `pdf2image`
+
+---
+
+## Installation
 
 ### 1. Cloner le projet
+
 ```bash
 git clone https://github.com/moun-13/smart-convention-management-ocr.git
 cd smart-convention-management-ocr
 ```
 
-### 2. Frontend (Next.js)
+### 2. Installer le frontend
+
 ```bash
 cd frontend
 npm install
-# Créez le fichier .env.local avec vos variables si nécessaire
 ```
 
-### 3. Backend (Laravel)
+### 3. Installer l'API Laravel
+
 ```bash
-cd laravel-api
+cd ../laravel-api
 composer install
 cp .env.example .env
 php artisan key:generate
-# Configurez la base de données dans le fichier .env
 php artisan migrate --seed
+php artisan storage:link
 ```
 
-### 4. Service OCR (FastAPI)
+Configurez ensuite la base de donnees dans `laravel-api/.env` si vous n'utilisez pas SQLite.
+
+### 4. Installer le service OCR
+
+```bash
+cd ../ocr-service
+python -m venv venv
+```
+
+Activation Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+Activation Linux/macOS:
+
+```bash
+source venv/bin/activate
+```
+
+Installation des dependances:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Lancement local
+
+L'application complete necessite les trois services en parallele.
+
+| Service | Dossier | Commande | URL |
+| --- | --- | --- | --- |
+| Frontend | `frontend` | `npm run dev` | `http://localhost:3000` |
+| API Laravel | `laravel-api` | `php artisan serve` | `http://127.0.0.1:8000` |
+| Service OCR | `ocr-service` | `python -m uvicorn main:app --reload --port 8001` | `http://127.0.0.1:8001` |
+
+Le frontend utilise l'API Laravel sur `http://127.0.0.1:8000/api`. Laravel transmet les fichiers OCR au service FastAPI sur `http://127.0.0.1:8001/extract`.
+
+---
+
+## Endpoints principaux
+
+### API Laravel
+
+| Methode | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/api/test` | Verification rapide de l'API Laravel |
+| `POST` | `/api/login` | Connexion utilisateur |
+| `POST` | `/api/logout` | Deconnexion utilisateur |
+| `GET` | `/api/me` | Profil de l'utilisateur connecte |
+| `GET` | `/api/conventions` | Liste des conventions |
+| `POST` | `/api/conventions` | Creation d'une convention |
+| `GET` | `/api/conventions/{id}` | Detail d'une convention |
+| `PUT/PATCH` | `/api/conventions/{id}` | Modification d'une convention |
+| `DELETE` | `/api/conventions/{id}` | Suppression d'une convention |
+| `POST` | `/api/ocr/extract` | Extraction OCR directe via Laravel |
+| `GET` | `/api/dashboard/statistiques` | Statistiques du tableau de bord |
+| `GET` | `/api/piece-jointes/{id}/download` | Telechargement d'une piece jointe |
+
+Les ressources `secteurs`, `domaines`, `programmes`, `provinces`, `type-conventions`, `porteur-projets`, `partenaires`, `piece-jointes` et `users` sont exposees avec des routes REST Laravel.
+
+### Service OCR FastAPI
+
+| Methode | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/health` | Etat du service OCR |
+| `GET` | `/diag` | Diagnostic des modules OCR, NLP et matching |
+| `POST` | `/extract` | Extraction depuis un fichier PDF ou DOCX |
+
+Exemple d'appel direct au service OCR:
+
+```bash
+curl -X POST http://127.0.0.1:8001/extract \
+  -F "file=@convention.pdf"
+```
+
+---
+
+## Roles et permissions
+
+- **Admin**: gestion complete des conventions, utilisateurs, referentiels et pieces jointes.
+- **Editeur**: creation et modification des conventions, ajout de pieces jointes et extraction OCR.
+- **Decideur**: consultation des conventions et acces aux statistiques.
+
+---
+
+## Tests et qualite
+
+Frontend:
+
+```bash
+cd frontend
+npm run lint
+npm run build
+```
+
+Laravel:
+
+```bash
+cd laravel-api
+php artisan test
+```
+
+OCR:
+
 ```bash
 cd ocr-service
-# Création d'un environnement virtuel
-python -m venv venv
-
-# Activation sous Windows : 
-venv\Scripts\activate
-# Activation sous Linux/Mac : 
-source venv/bin/activate
-
-pip install -r requirements.txt
-cp .env.example .env
+python -m uvicorn main:app --reload --port 8001
+python tests/evaluation.py
 ```
 
 ---
 
-## 🚀 Lancement des Services
+## Notes de configuration
 
-Pour un fonctionnement local complet, démarrez les 3 services simultanément :
-
-| Service | Commande (dans le bon dossier) | URL Locale par défaut |
-|---------|--------------------------------|-----------------------|
-| **Frontend** | `npm run dev` | `http://localhost:3000` |
-| **Laravel API** | `php artisan serve` | `http://localhost:8000` |
-| **OCR Service** | `python -m uvicorn main:app --reload --port 8001` | `http://localhost:8001` |
+- Le service OCR limite les fichiers a **20 MB**.
+- Les formats supportes par l'OCR sont **PDF** et **DOCX**.
+- Les resultats OCR sont caches dans `ocr-service/results_cache/`.
+- Le moteur OCR par defaut est EasyOCR. Le code prevoit aussi une configuration `OCR_ENGINE`.
+- Les URLs locales sont actuellement configurees en dur dans plusieurs services frontend et dans le controleur Laravel OCR.
 
 ---
 
-## 🔌 Endpoints Principaux
+## Ameliorations possibles
 
-### Laravel API (`/api/*`)
-- `POST /login` : Authentification utilisateur.
-- `GET /conventions` : Liste des conventions (avec rôles & permissions).
-- `POST /piece-jointes/ocr/extract` : Soumission d'une pièce jointe pour traitement IA.
-- `GET /dashboard/statistiques` : Récupération des données pour le dashboard.
-
-### Service OCR (`/`)
-- `GET /health` : Vérification du statut du service.
-- `GET /diag` : Diagnostic détaillé des modules IA.
-- `POST /extract` : Extraction et analyse du document PDF/DOCX (retourne les entités en JSON).
+- Centraliser les URLs API dans des variables d'environnement.
+- Ajouter un fichier `.env.example` pour le service OCR.
+- Ajouter des tests automatises pour le pipeline OCR et les roles Laravel.
+- Ajouter des captures d'ecran reelles de l'application.
+- Ajouter une file d'attente Laravel pour traiter les OCR longs en arriere-plan.
+- Ajouter un suivi d'etat pour les documents en cours d'analyse.
 
 ---
 
-## 📸 Captures d'Écran
+## Auteur
 
-> *Les captures d'écran de l'interface seront ajoutées très prochainement.*
+Developpe dans le cadre d'un Projet de Fin d'Annee (PFA) autour de la numerisation et de l'automatisation intelligente des flux administratifs.
 
-| Tableau de bord | Détail d'une Convention |
-|-----------------|-------------------------|
-| ![Dashboard Placeholder](https://via.placeholder.com/600x350?text=Dashboard+Principal) | ![Convention Placeholder](https://via.placeholder.com/600x350?text=Details+Convention) |
-
-| Extraction OCR | Gestion des Partenaires |
-|----------------|-------------------------|
-| ![OCR Placeholder](https://via.placeholder.com/600x350?text=Vue+Extraction+OCR) | ![Partenaires Placeholder](https://via.placeholder.com/600x350?text=Liste+Partenaires) |
+**GitHub**: [@moun-13](https://github.com/moun-13)
 
 ---
 
-## 🔮 Améliorations Futures
-- [ ] Prise en charge de nouveaux formats de documents (ex: Excel).
-- [ ] Fine-tuning des modèles NLP pour des documents juridiques marocains spécifiques.
-- [ ] Interface d'annotation pour l'apprentissage continu du modèle OCR.
-- [ ] Génération automatique des contrats en format PDF structuré depuis la plateforme.
+## Licence
 
----
-
-## 👨‍💻 Auteur
-
-Développé dans le cadre d'un Projet de Fin d'Année (PFA) axé sur la numérisation et l'automatisation intelligente des flux administratifs.
-
-**GitHub** : [@moun-13](https://github.com/moun-13)
-
----
-
-## 🤝 Contribution
-
-Les contributions sont les bienvenues !
-1. **Forkez** le projet.
-2. Créez votre branche (`git checkout -b feature/NouvelleFonctionnalite`).
-3. Commitez vos modifications (`git commit -m 'Ajout dune NouvelleFonctionnalite'`).
-4. Pushez vers la branche (`git push origin feature/NouvelleFonctionnalite`).
-5. Ouvrez une **Pull Request**.
-
----
-
-## 📜 Licence
-
-Ce projet est sous licence **MIT**. Vous êtes libre de l'utiliser, de le modifier et de le distribuer. Voir le fichier `LICENSE` pour plus de détails.
+Ce projet est indique sous licence **MIT**.

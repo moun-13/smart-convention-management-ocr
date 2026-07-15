@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 # Taille max du fichier (20 MB)
 MAX_FILE_SIZE = 20 * 1024 * 1024
 RESULTS_CACHE_DIR = Path(__file__).resolve().parent / "results_cache"
-CACHE_VERSION = "business-schema-v10"
+CACHE_VERSION = "business-schema-v12"
 SUPPORTED_EXTENSIONS = {".pdf", ".docx"}
 
 
@@ -56,8 +56,11 @@ def _load_cached_result(file_hash: str):
     try:
         with path.open("r", encoding="utf-8") as f:
             cached = json.load(f)
-        if cached.get("_cache_version") != CACHE_VERSION:
+        
+        cached_version = cached.get("_cache_version")
+        if cached_version not in [CACHE_VERSION, "business-schema-v11"]:
             return None
+        
         cached.pop("_cache_version", None)
         cached.pop("_source_type", None)
         return cached

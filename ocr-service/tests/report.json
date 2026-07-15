@@ -1,0 +1,85 @@
+{
+  "documents": {
+    "convention RSM Pref Police Agadir (2).pdf": {
+      "total_fields": 15,
+      "extracted_fields": 14,
+      "missing_fields": 1,
+      "correct_fields": 13,
+      "precision": 86.66666666666667,
+      "errors": {
+        "رقم_الاتفاقية": {
+          "expected": "ج.س.م/2022",
+          "extracted": "",
+          "reason": "missing"
+        },
+        "الاختصاص": {
+          "expected": " دعم مصالح الأمن بجهة سوس ماسة باقتناء الآليات والمعدات والوسائل اللوجستيكية",
+          "extracted": "اقتناء الآليات والمعدات والوسائل اللوجستيكية لفائدة مصالح الأمن",
+          "reason": "mismatch"
+        }
+      }
+    },
+    "Convention_ADD VF (1).pdf": {
+      "total_fields": 14,
+      "extracted_fields": 12,
+      "missing_fields": 2,
+      "correct_fields": 12,
+      "precision": 85.71428571428571,
+      "errors": {
+        "تاريخ_البداية": {
+          "expected": "06 يوليوز 2026",
+          "extracted": "",
+          "reason": "missing"
+        },
+        "رقم_القرار": {
+          "expected": "مقرر مجلس الجهة",
+          "extracted": "",
+          "reason": "missing"
+        }
+      }
+    },
+    "convention_data tika (1).pdf": {
+      "total_fields": 14,
+      "extracted_fields": 13,
+      "missing_fields": 1,
+      "correct_fields": 10,
+      "precision": 71.42857142857143,
+      "errors": {
+        "رقم_الاتفاقية": {
+          "expected": "RSM/2026/SO/07/N°X",
+          "extracted": "11114",
+          "reason": "mismatch"
+        },
+        "تاريخ_البداية": {
+          "expected": "06 يوليوز 2026",
+          "extracted": "",
+          "reason": "missing"
+        },
+        "الأطراف": {
+          "expected": [
+            "جهة سوس ماسة",
+            "اللجنة الوطنية لمراقبة حماية المعطيات ذات الطابع الشخصي (CNDP)"
+          ],
+          "extracted": [
+            "ذات الطابع الشخصيء ممثله من طرف رييسهاء والمشار اليها لاحقا ب \" الجنه \""
+          ],
+          "reason": "mismatch"
+        },
+        "حالة_الاتفاقية": {
+          "expected": "سارية المفعول",
+          "extracted": "قيد التنفيذ",
+          "reason": "mismatch"
+        }
+      }
+    }
+  },
+  "global_precision": 81.26984126984127,
+  "most_failed_fields": {
+    "رقم_الاتفاقية": 2,
+    "تاريخ_البداية": 2,
+    "الاختصاص": 1,
+    "رقم_القرار": 1,
+    "الأطراف": 1,
+    "حالة_الاتفاقية": 1
+  }
+}

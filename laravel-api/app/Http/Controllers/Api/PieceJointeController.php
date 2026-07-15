@@ -25,6 +25,7 @@ class PieceJointeController extends Controller
      */
     public function store(Request $request)
     {
+        set_time_limit(600);
         $validated = $request->validate([
             'convention_id' => 'required|exists:conventions,id',
             'fichier' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
@@ -45,7 +46,7 @@ class PieceJointeController extends Controller
 
         // Envoyer le PDF au service OCR avec un timeout plus long car l'OCR peut prendre du temps
         try {
-            $response = Http::timeout(120)->attach(
+            $response = Http::timeout(600)->attach(
                 'file',
                 fopen(storage_path('app/public/' . $chemin), 'r'),
                 $nomOriginal
@@ -87,12 +88,13 @@ class PieceJointeController extends Controller
      */
     public function extract(Request $request)
     {
+        set_time_limit(600);
         $request->validate([
             'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         try {
-            $response = Http::timeout(120)->attach(
+            $response = Http::timeout(600)->attach(
                 'file',
                 fopen($request->file('file')->getPathname(), 'r'),
                 $request->file('file')->getClientOriginalName()

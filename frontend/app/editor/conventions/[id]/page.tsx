@@ -32,9 +32,9 @@ interface ConventionDetailsData {
   programme?: NamedResource;
   domaine?: NamedResource;
   province?: NamedResource;
-  typeConvention?: NamedResource;
-  porteurProjet?: NamedResource;
-  porteurDelegue?: NamedResource;
+  type_convention?: NamedResource;
+  porteur_projet?: NamedResource;
+  porteur_delegue?: NamedResource;
   session?: string;
   numero_decision?: string;
   contribution_region?: string | number;
@@ -141,7 +141,7 @@ export default function ConventionDetails() {
               title="التاريخ"
               value={
                 convention.date_convention
-                  ? new Date(convention.date_convention).toLocaleDateString("ar-EG")
+                  ? new Date(convention.date_convention).toLocaleDateString("en-GB")
                   : "-"
               }
             />
@@ -150,13 +150,13 @@ export default function ConventionDetails() {
             <Info title="البرنامج" value={convention.programme?.nom} />
             <Info title="المجال" value={convention.domaine?.nom} />
             <Info title="الإقليم" value={convention.province?.nom} />
-            <Info title="نوع الاتفاقية" value={convention.typeConvention?.nom} />
-            <Info title="صاحب المشروع" value={convention.porteurProjet?.nom} />
-            <Info title="صاحب المشروع المنتدب" value={convention.porteurDelegue?.nom} />
+            <Info title="نوع الاتفاقية" value={convention.type_convention?.nom} />
+            <Info title="صاحب المشروع" value={convention.porteur_projet?.nom} />
+            <Info title="صاحب المشروع المنتدب" value={convention.porteur_delegue?.nom} />
             <Info title="الدورة" value={convention.session} />
             <Info title="رقم القرار" value={convention.numero_decision} />
-            <Info title="مساهمة الجهة" value={convention.contribution_region} />
-            <Info title="التكلفة الإجمالية" value={`${convention.cout_total} DH`} />
+            <Info title="مساهمة الجهة" value={convention.contribution_region ? `${Number(convention.contribution_region).toLocaleString()} DH` : "-"} />
+            <Info title="التكلفة الإجمالية" value={convention.cout_total ? `${Number(convention.cout_total).toLocaleString()} DH` : "-"} />
           </div>
 
           <div className="mt-10">

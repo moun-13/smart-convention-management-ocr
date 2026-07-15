@@ -8,7 +8,8 @@ load_dotenv()
 
 client = OpenAI(
     api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1"
+    base_url="https://api.groq.com/openai/v1",
+    timeout=15.0,
 )
 
 SYSTEM_PROMPT = """
@@ -61,12 +62,15 @@ RÈGLES D'EXTRACTION
   رقم الاتفاقية
   Référence
   RSM/2026/...
-- Ne pas retourner un numéro de loi.
+- Le numéro peut aussi être un code isolé en haut de la page (ex: "ج.س.م/2022") sans le mot "رقم".
+- Exemples de formats possibles : "ج.س.م/2022", "14/2023/ج.س.م", "RSM/2026/SO/07/N°X"
+- Ne JAMAIS retourner un numéro de loi (comme "111.14", "11114", "113.14", "67.17") ou un numéro de décret.
 
 تاريخ_البداية
-- Retourner la date de signature.
-- Format :
-  06 مارس 2023
+- Date de signature de la convention (jour mois année).
+- Souvent trouvée à la fin du document (dans la section des signatures) ou dans l'introduction (بتاريخ ...).
+- FORMAT ATTENDU : Transforme TOUJOURS la date au format "YYYY-MM-DD" (ex: "2022-10-05").
+- Si tu ne trouves que l'année (ex: 2022), retourne "2022-01-01".
 
 السنة
 - Retourner l'année de la convention.
@@ -93,14 +97,10 @@ Retourner uniquement la phrase décrivant l'objet de la convention.
 Ne pas retourner tout le paragraphe.
 
 الأطراف
-Retourner la liste des parties signataires.
-
-Exemple :
-
-[
-"جهة سوس ماسة",
-"وكالة التنمية الرقمية"
-]
+- Liste des institutions, ministères, ou entités qui signent la convention.
+- Extraire UNIQUEMENT le nom brut de l'entité (ex: "جهة سوس ماسة", "اللجنة الوطنية لمراقبة حماية المعطيات ذات الطابع الشخصي").
+- NE PAS inclure les mentions des représentants (ex: supprimer "ممثلة من طرف رئيسها", "ينوب عنها", etc.).
+- Renvoyer sous forme de liste.
 
 الشريك
 Retourner uniquement le partenaire principal.
@@ -177,8 +177,8 @@ Exemple :
 برنامج التنمية الجهوية
 
 الاختصاص
-
-Retourner uniquement l'objet de la compétence si présent.
+- Retourner la phrase complète décrivant la nature de l'intervention ou du soutien (ex: "دعم وتجهيز مصالح القيادة الجهوية للقوات المساعدة وبناء وتأهيل مقراتها").
+- Ne pas couper la phrase prématurément, l'objectif est d'avoir le contexte complet de la compétence de la région.
 
 المرفقات
 

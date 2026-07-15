@@ -86,10 +86,10 @@ FIELD_CONFIGS = [
             # "اتفاقية رقم 1-151-83" ou "اتفاقية رقم: 1-151-83"
             r'(?:اتفاقية|الاتفاقية)\s*(?:رقم|عدد)\s*[:\s]*([^\n]{2,50})',
             r'(?:رقم|عدد)\s*(?:الاتفاقية|اتفاقية)\s*[:\s]*([^\n]{2,50})',
-            # Numéro standalone type "1-151-83" ou "2024/123"
+            # Nouveaux patterns pour supporter chiffres, lettres, tirets et slash (ex: ج.س.م/2022, N°X)
+            # avec une restriction pour ne pas matcher la loi 111.14
+            r'(?:رقم|عدد)\s*[:\s]*([أ-يa-zA-Z0-9\.\-/\°N\s]+?)(?=\s*(?:\n|بتاريخ|في|من|\b111\.14|\b113\.14|\b67\.17|المتعلق|$))',
             r'(?:رقم|عدد)\s*[:\s]*([\d][\d/\-\s]*[\d])',
-            # Pattern large: tout ce qui suit رقم/عدد avec des chiffres et tirets
-            r'(?:رقم|عدد)\s*[:\s]*(\d[\d\-/\s\.]+\d)',
         ],
         max_value_length=50,
         sections=["cover", "preamble"]
@@ -315,6 +315,7 @@ FIELD_CONFIGS = [
             'معلقة': 'معلقة',
             'جديدة': 'جديدة',
         },
+        max_value_length=20,
         sections=["cover", "last_page"]
     ),
     FieldConfig(
