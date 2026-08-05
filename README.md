@@ -18,7 +18,7 @@
 
 **Smart Convention Management OCR** est une application de gestion des conventions administratives. Elle centralise les conventions, leurs pieces jointes, les partenaires, les programmes, les domaines, les provinces et les statistiques de suivi.
 
-Le projet ajoute un service OCR/IA capable d'analyser des documents PDF ou DOCX, d'extraire le texte, puis de detecter automatiquement les informations importantes pour pre-remplir les formulaires de convention.
+Le projet ajoute un service OCR/IA capable d'analyser des documents PDF , d'extraire le texte, puis de detecter automatiquement les informations importantes pour pre-remplir les formulaires de convention.
 
 ## Objectifs
 
